@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   movies,
@@ -33,10 +34,14 @@ type PollSnapshot = {
 
 function BrandMark() {
   return (
-    <div className="brand-mark" aria-label="Lowe's Home Improvement">
-      <span>LOWE&apos;S</span>
-      <small>HOME IMPROVEMENT</small>
-    </div>
+    <Image
+      className="brand-mark"
+      src="/lowes-gable.png"
+      alt="Lowe's"
+      width={1354}
+      height={623}
+      priority
+    />
   );
 }
 

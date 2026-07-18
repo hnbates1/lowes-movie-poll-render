@@ -72,32 +72,11 @@ button {
 }
 
 .brand-mark {
-  width: 142px;
-  height: 72px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 9px;
-  color: white;
-  background: var(--lowes-blue);
-  clip-path: polygon(50% 0, 100% 28%, 94% 100%, 6% 100%, 0 28%);
+  display: block;
+  width: 154px;
+  height: auto;
   filter: drop-shadow(5px 6px 0 var(--shadow));
   transform: rotate(-1deg);
-}
-
-.brand-mark span {
-  font-size: 23px;
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: -1.4px;
-}
-
-.brand-mark small {
-  margin-top: 3px;
-  font-size: 6px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
 }
 
 .store-pill,
@@ -1312,8 +1291,7 @@ button {
   .thanks-brand-row,
   .carousel-section,
   .ballot-section { width: min(100% - 28px, 1380px); }
-  .brand-mark { width: 116px; height: 59px; }
-  .brand-mark span { font-size: 19px; }
+  .brand-mark { width: 124px; }
   .store-pill { padding: 9px 12px; font-size: 10px; }
   .browse-hero { padding-top: 18px; }
   .hero-copy { padding-top: 46px; }
