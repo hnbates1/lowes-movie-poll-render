@@ -75,6 +75,45 @@ async function importLegacyResults(client: PoolClient, results: LegacyResult[]) 
   }
 }
 
+async function applyApprovedCorrections(client: PoolClient) {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS poll_corrections (
+      correction_id TEXT PRIMARY KEY,
+      applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  const correctionId = "2026-07-20-interstellar-minus-4";
+  const correction = await client.query<{ correction_id: string }>(
+    `INSERT INTO poll_corrections (correction_id)
+     VALUES ($1)
+     ON CONFLICT (correction_id) DO NOTHING
+     RETURNING correction_id`,
+    [correctionId],
+  );
+  if (correction.rowCount === 0) return;
+
+  const deleted = await client.query<{ id: string }>(
+    `WITH votes_to_remove AS (
+       SELECT id
+       FROM movie_votes
+       WHERE poll_id = $1 AND movie_id = $2
+       ORDER BY submitted_at DESC, id DESC
+       LIMIT 4
+     )
+     DELETE FROM movie_votes
+     WHERE id IN (SELECT id FROM votes_to_remove)
+     RETURNING id`,
+    [POLL_ID, 7],
+  );
+
+  if (deleted.rowCount !== 4) {
+    throw new Error(
+      `Expected to remove 4 Interstellar votes, but removed ${deleted.rowCount ?? 0}.`,
+    );
+  }
+}
+
 async function ensureSchema() {
   const legacyResults = await readLegacyResults();
   const pool = getPool();
@@ -100,6 +139,7 @@ async function ensureSchema() {
       "CREATE INDEX IF NOT EXISTS movie_votes_poll_id_idx ON movie_votes (poll_id)",
     );
     await importLegacyResults(client, legacyResults);
+    await applyApprovedCorrections(client);
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");
