@@ -143,7 +143,13 @@ function MovieCard({
   );
 }
 
-function BrowseScreen({ onVote }: { onVote: () => void }) {
+function BrowseScreen({
+  onVote,
+  onViewResults,
+}: {
+  onVote: () => void;
+  onViewResults: () => void;
+}) {
   const [flippedMovieId, setFlippedMovieId] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -265,9 +271,14 @@ function BrowseScreen({ onVote }: { onVote: () => void }) {
           <span className="mini-diamond" aria-hidden="true">◆</span>
           <p><b>Seen enough?</b> Your ballot is one tap away.</p>
         </div>
-        <button className="primary-button" type="button" onClick={onVote}>
-          Cast your vote <span aria-hidden="true">→</span>
-        </button>
+        <nav className="browse-action-buttons" aria-label="Poll actions">
+          <button className="secondary-button" type="button" onClick={onViewResults}>
+            View live results <span aria-hidden="true">↗</span>
+          </button>
+          <button className="primary-button" type="button" onClick={onVote}>
+            Cast your vote <span aria-hidden="true">→</span>
+          </button>
+        </nav>
       </footer>
     </main>
   );
@@ -662,5 +673,16 @@ export default function MoviePoll() {
     );
   }
 
-  return <BrowseScreen onVote={() => setScreen("vote")} />;
+  return (
+    <BrowseScreen
+      onVote={() => setScreen("vote")}
+      onViewResults={() => {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set("results", "live");
+        window.history.replaceState({}, "", `${nextUrl.pathname}${nextUrl.search}`);
+        setScreen("results");
+        void loadPollStatus();
+      }}
+    />
+  );
 }
